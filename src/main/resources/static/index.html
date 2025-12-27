@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+        h2 {
+            margin-top: 30px;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button.delete {
+            background: #dc3545;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+        pre {
+            background: #eee;
+            padding: 10px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🚀 User Management System</h1>
+
+<!-- REGISTER -->
+<div class="card">
+    <h2>Register User</h2>
+    <input id="rName" placeholder="Name">
+    <input id="rEmail" placeholder="Email">
+    <input id="rPassword" placeholder="Password">
+    <button onclick="register()">Register</button>
+</div>
+
+<!-- LOGIN -->
+<div class="card">
+    <h2>Login</h2>
+    <input id="lEmail" placeholder="Email">
+    <input id="lPassword" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <pre id="loginResult"></pre>
+</div>
+
+<!-- GET USER BY ID -->
+<div class="card">
+    <h2>Get User By ID</h2>
+    <input id="getId" placeholder="User ID">
+    <button onclick="getById()">Get</button>
+    <pre id="getByIdResult"></pre>
+</div>
+
+<!-- UPDATE USER -->
+<div class="card">
+    <h2>Update User</h2>
+    <input id="uId" placeholder="User ID">
+    <input id="uName" placeholder="Name">
+    <input id="uEmail" placeholder="Email">
+    <input id="uPassword" placeholder="Password">
+    <button onclick="update()">Update</button>
+</div>
+
+<!-- DELETE USER -->
+<div class="card">
+    <h2>Delete User By ID</h2>
+    <input id="dId" placeholder="User ID">
+    <button class="delete" onclick="deleteById()">Delete</button>
+</div>
+
+<!-- GET ALL USERS -->
+<div class="card">
+    <h2>All Users</h2>
+    <button onclick="getAll()">Load Users</button>
+    <table id="userTable"></table>
+</div>
+
+<script>
+    const BASE_URL = "http://localhost:3360/api/users";
+
+    function register() {
+        fetch(BASE_URL + "/register", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                name: rName.value,
+                email: rEmail.value,
+                password: rPassword.value
+            })
+        })
+        .then(res => res.json())
+        .then(data => alert("Registered with ID: " + data.id));
+    }
+
+    function login() {
+        fetch(BASE_URL + "/login", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                email: lEmail.value,
+                password: lPassword.value
+            })
+        })
+        .then(res => res.json())
+        .then(data => loginResult.innerText = JSON.stringify(data, null, 2));
+    }
+
+    function getById() {
+        fetch(BASE_URL + "/id/" + getId.value)
+            .then(res => res.json())
+            .then(data => getByIdResult.innerText = JSON.stringify(data, null, 2));
+    }
+
+    function update() {
+        fetch(BASE_URL + "/id/" + uId.value, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                name: uName.value,
+                email: uEmail.value,
+                password: uPassword.value
+            })
+        })
+        .then(res => res.json())
+        .then(data => alert("Updated Successfully"));
+    }
+
+    function deleteById() {
+        fetch(BASE_URL + "/id/" + dId.value, {
+            method: "DELETE"
+        })
+        .then(() => alert("Deleted Successfully"));
+    }
+
+    function getAll() {
+        fetch(BASE_URL)
+            .then(res => res.json())
+            .then(data => {
+                let html = "<tr><th>ID</th><th>Name</th><th>Email</th><th>Password</th></tr>";
+                data.forEach(u => {
+                    html += `<tr>
+                                <td>${u.id}</td>
+                                <td>${u.name}</td>
+                                <td>${u.email}</td>
+                                <td>${u.password}</td>
+                             </tr>`;
+                });
+                userTable.innerHTML = html;
+            });
+    }
+</script>
+
+</body>
+</html>
